@@ -43,8 +43,9 @@ numTonePresentations = numTonePresentations * numRep;
 rampLength = 5;
 cosRamp = (rampLength/1000)*fs;
 
-multiplier = fs/1000;
+multiplier = floor(fs/1000);
 s = zeros(1,trialDur*multiplier);
+ind = 1;
 for ii = 1:numTonePresentations
     ind = (ii-1)*(toneSOA+toneDur)*multiplier + 1;
     tmax = toneDur/1000;                               % Time Duration Of Signal (sec)
@@ -52,7 +53,8 @@ for ii = 1:numTonePresentations
     f = frequencyBuffer(ii);                                 % Original Frequency
     tone = sin(2*pi*f*t);% Original Signal %TODO: multiply voltage - from calib
     tone = pa_ramp(tone, cosRamp, fs); 
-    s(ind:ind+toneDur*multiplier-1) = tone';
+    s(ind:ind+length(tone)-1) = tone';
+    ind = ind+length(tone);
 end
 td = 0:1/fs:(length(s)-1)/fs;
 

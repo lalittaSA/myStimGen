@@ -1,4 +1,4 @@
-function [td,s,frequencyBuffer,isH] = stimGen_static_HL(loFreq,hiFreq,toneDur,toneSOA,trialDur,coh,fs);
+function [td,s,frequencyBuffer,isH] = stimGen_dynamic_IBI_HL(loFreq,hiFreq,toneDur,IBI_range,trialDur,coh,fs);
 % stimGen_static_HL generates a sequence of tone bursts of 2 frequencies (loFreq & hiFreq)
 % each tone lasts 'toneDur' ms and is followed by an inter-tone interval of 'toneSOA'
 % the ratio of loFreq and hiFreq tones is determined by 'coh'
@@ -8,7 +8,7 @@ function [td,s,frequencyBuffer,isH] = stimGen_static_HL(loFreq,hiFreq,toneDur,to
 % loFreq    - lowest frequency in Hz
 % hiFreq    - highest frequency in Hz
 % toneDur   - tone duration in ms
-% toneSOA   - stimulus onset asynchrony = inter-tone interval in ms
+% IBI_range - inter-burst interval range in ms
 % trialDur  - trial duration in ms
 % coh       - coherence 0, 0.25, 0.5, 0.75, 1
 
@@ -20,7 +20,7 @@ function [td,s,frequencyBuffer,isH] = stimGen_static_HL(loFreq,hiFreq,toneDur,to
 % loFreq = 312.5; %hz  625 | 1250 | 2500 | 5000
 % hiFreq = 625; %hz   1250 | 2500 | 5000 | 10000
 % toneDur = 40; %ms
-% toneSOA = 10; %ms
+% IBI_range = [10:100]; %ms
 % trialDur = 2000;
 % coh = 0.7;
 
