@@ -68,7 +68,12 @@ for ii = 1:numTonePresentations
     tone = sin(2*pi*f*t);% Original Signal %TODO: multiply voltage - from calib
     tone = pa_ramp(tone, cosRamp, fs); 
     s(ind:ind+length(tone)-1) = tone';
-    ind = ind+length(tone);
+    if ii < numTonePresentations
+        ind = ind+length(tone)+(toneSOA/1000*fs);
+    else
+        ind = ind+length(tone)-1;
+        s = s(1:ind);
+    end
 end
 
 td = 0:1/fs:(length(s)-1)/fs;
