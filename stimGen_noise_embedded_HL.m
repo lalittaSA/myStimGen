@@ -35,9 +35,16 @@ toneAmpL = 0.6;
 toneAmpH = 0.6;
 fs = 44100;%2e5;
 end
-%% generate noise
-noiseAmp = 1;
 
+%%
+tdt = 0;
+if tdt
+    global TDT
+    noiseAmp = TDT.TNR;
+else
+    noiseAmp = 1;
+end
+%% generate noise
 [B1,A1] = fir1(256,0.95);
 % fvtool(B1,A1,'Fs',fs)
 
