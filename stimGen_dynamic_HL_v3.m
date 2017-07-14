@@ -31,7 +31,7 @@ function [td,s,frequencyBuffer,isH] = stimGen_dynamic_HL_v3(loFreq,hiFreq,toneDu
 % td - time bins
 % s - auditory stream
 
-%% some default variable for function testing
+% %% some default variable for function testing
 % loFreq = 500; %hz      312.5 |  625 | 1250 | 2500 |  5000
 % hiFreq = 4000; %hz     625   | 1250 | 2500 | 5000 | 10000
 % toneDur = 40; %ms
@@ -169,7 +169,7 @@ isH = numHi > numLo;
 % isH = numHi > numLo;
 
 %% generate sequence of tones
-%  fs = 10000;%384000;%12000;
+% fs = 10000;%384000;%12000;
 rampLength = 5;
 cosRamp = (rampLength/1000)*fs;
 
@@ -193,7 +193,7 @@ end
 td = 0:1/fs:(length(s)-1)/fs;
 
 %% for testing - listen
-% sound(s, fs) 
+%sound(s, fs) 
 
 % record
 % filename = 'sample_stim2.wav';
