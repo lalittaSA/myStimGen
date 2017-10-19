@@ -1,4 +1,4 @@
-function [td,s,frequencyBuffer,isH] = stimGen_noise_embedded_HL(loFreq,hiFreq,freqType,toneDur,toneIBI,toneAmpL,toneAmpH,lastToneAmp,fs);
+function [td,s,frequencyBuffer,isH] = stimGen_noise_embedded_HL(loFreq,hiFreq,freqType,toneDur,toneIBI,toneAmpL,toneAmpH,lastToneAmp,noiseAmp,fs);
 % stimGen_noise_embedded_HL generates a sequence of tone bursts generated from 2 frequencies (loFreq & hiFreq)
 % the first n-1 tones have clear signal to noise ratio while the last tone has varied SNR
 % each tone lasts 'toneDur' ms and is followed by an inter-burst interval of 'toneIBI'
@@ -25,33 +25,31 @@ function [td,s,frequencyBuffer,isH] = stimGen_noise_embedded_HL(loFreq,hiFreq,fr
 %% some default variable for function testing
 test = 0;
 if test
-loFreq = 500; %hz  625 | 1250 | 2500 | 5000
-hiFreq = 2000; %hz   1250 | 2500 | 5000 | 10000
-toneDur = 500; %ms
-toneIBI = 100; %ms
-freqType = 'H';
-lastToneAmp = 0.5;
-toneAmpL = 0.6;
-toneAmpH = 0.6;
-fs = 44100;%2e5;
+    loFreq = 250; %hz  625 | 1250 | 2500 | 5000
+    hiFreq = 2000; %hz   1250 | 2500 | 5000 | 10000
+    toneDur = 300; %ms
+    toneIBI = 100; %ms
+    freqType = 'H';
+    lastToneAmp = 0.001;
+    % toneAmpL = 0.6;
+    % toneAmpH = 0.6;
+    toneAmpL = 0.001;%calibrationFile.calibratedamplitude(1);
+    toneAmpH = 0.0001;%calibrationFile.calibratedamplitude(2);
+    fs = 44100;%2e5;
+    noiseAmp = 0.0118;
 end
 
 %%
-tdt = 0;
-if tdt
-    global TDT
-    noiseAmp = TDT.TNR;
+database_calib_filename = 'calibNoise.mat';
+if exist(database_calib_filename,'file')
+    load(database_calib_filename)
+    invFilter = CalibData.hinv;
 else
-    noiseAmp = 1;
+    error('noise calibration file not found!')
 end
 %% generate noise
-[B1,A1] = fir1(256,0.95);
+% [B1,A1] = fir1(512,0.95);
 % fvtool(B1,A1,'Fs',fs)
-
-white_noise = randn(fs, 1);
-noise_limited = filter(B1,A1,white_noise);
-
-noise_limited = noise_limited * noiseAmp;
 
 %% generate sequence of frequencies
 
@@ -72,15 +70,22 @@ for ii = 1:nTones
     switch freqType(ii)
         case 'H', tmpFreq = hiFreq; toneAmp = toneAmpH;      % high frequency
         case 'L', tmpFreq = loFreq; toneAmp = toneAmpL;      % low frequency
+        case 'N', tmpFreq = loFreq; toneAmp = 0; lastToneAmp = 0;
     end
     
+    % generate tone
     tone = sin(2*pi*tmpFreq*t);
     tone = pa_ramp(tone, cosRamp, fs);
     
+    % generate noise
+    white_noise = randn(fs*tmax, 1);
+%     noise_limited = filter(B1,A1,white_noise);
+    noise_limited = conv(white_noise,invFilter) * noiseAmp;
+    
     if ii == nTones % if last tone
-        tone = (lastToneAmp*tone)+noise_limited(1:length(tone));
+        tone = (lastToneAmp*tone) + noise_limited(1:length(tone));
     else
-        tone = (toneAmp*tone)+noise_limited(1:length(tone));
+        tone = (toneAmp*tone) + noise_limited(1:length(tone));
     end
     
     frequencyBuffer(ii) = tmpFreq;
